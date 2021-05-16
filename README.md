@@ -11,7 +11,7 @@ You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/
 ## Create SQL Procedures
 You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLProcedures.ps1) once.  Alternatively run the [query](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLProcedures.sql) directly in SQL to create the procedures in the database.  These SQL procedures will be used to update the tables in the database.
 ## Update SQL Tables
-Run this script to collect data from Datto RMM and store it in the SQL tables.  The script will first load the data into temp tables, and then merge the data with the live data.  This will avoid data corruption or duplication when the script fails to run.  You can create a Datto RMM component to excute the script daily, which is the recommended interval, reducing storage.
+Run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/UpdateSQLTables.ps1) to collect data from Datto RMM and store it in the SQL tables.  It will first load the data into temp tables, and then merge the data with the live data.  This will avoid data corruption or duplication when the script fails to run.  You can create a Datto RMM component to excute the script daily, which is the recommended interval, reducing storage.
 # SQL Tables
 Documentation comming soon!
 
