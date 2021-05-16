@@ -1,5 +1,5 @@
 # About
-This project is a cooperation between Datto and myself.  The PowerShell scripts in this project will allow you to pull data from Datto RMM and store in a database, making it possible to create historical dashboards or reports in PowerBI.
+This cotribution is a cooperation between Datto and myself, we both agreed to make this a community project.  The PowerShell scripts in this project will allow you to pull data from Datto RMM and store in a database, making it possible to create historical dashboards or reports in PowerBI.
 # Prerequisites
 ## SQL
 You'll need a Microsoft SQL Server to store the Datto RMM data.  You can download [Microsoft SQL Express](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads) for testing.  Store the SQL credentials in the provide registry import file.
