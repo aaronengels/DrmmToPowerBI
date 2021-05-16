@@ -13,7 +13,7 @@ You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/
 ## Update SQL Tables
 Run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/UpdateSQLTables.ps1) to collect data from Datto RMM and store it in the SQL tables.  It will first load the data into temp tables, and then merge the data with the live data.  This will avoid data corruption or duplication when the script fails to run.  You can create a Datto RMM component to excute the script daily, which is the recommended interval, reducing storage.
 # SQL Tables
-Documentation comming soon!
+Documentation Comming Soon :slightly_smiling_face:
 
 
 
