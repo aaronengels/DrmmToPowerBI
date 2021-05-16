@@ -7,8 +7,11 @@ You'll need a Microsoft SQL Server to store the Datto RMM data.  You can downloa
 You'll need to create API keys to run the PowerShell scripts.  Find more information how to create API keys in the [Datto Online Help](https://help.aem.autotask.net/en/Content/2SETUP/APIv2.htm).  Store the API keys in the provide registry file.
 # Scripts
 ## Create SQL Tables
+You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLTables.ps1) once.  Alternatively run the [query](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLTables.sql) directly in SQL to create the tables in the database. I decided to create a simple database schema that can be used easly to create dashboards and reports in Microsoft PowerBI.
 ## Create SQL Procedures
+You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLProcedures.ps1) once.  Alternatively run the [query](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLProcedures.sql) directly in SQL to create the procedures in the database. These SQL procedures will be used to update the tables in the database.
 ## Update SQL Tables
+
 
 
 
