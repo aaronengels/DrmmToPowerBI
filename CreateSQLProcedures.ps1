@@ -20,4 +20,4 @@ $sqlParams = [ordered]@{
 $connString = 'Server={0};Database={1};User Id={2};Password={3};' -f [array]$sqlParams.Values
 
 # Run SQL query to Create SQL Procedures
-Invoke-Sqlcmd -ConnectionString $connString -InputFile 'CreateProcedures.sql'
+Invoke-Sqlcmd -ConnectionString $connString -InputFile 'CreateSQLProcedures.sql'
