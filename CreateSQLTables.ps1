@@ -6,6 +6,7 @@ if (!$Config) {
 }
 
 # Import Module
+Remove-Module SQLPS
 Import-Module SQLServer -Force
 
 # Create SQL Connection Parameters
