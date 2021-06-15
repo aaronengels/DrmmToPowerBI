@@ -8,6 +8,13 @@
 			Write-Host 'Registry keys not found. Please import DrmmToPowerBI.reg first!'
 			exit 1
 		}
+		if ( $null -ne $env:DrmmToPowerBICredentialKey ) {
+			$EncryptionKeyBytes = ( [system.Text.Encoding]::UTF8 ).GetBytes( $env:DrmmToPowerBICredentialKey )
+			$Config.SQLPassword = $Config.SQLPassword | ConvertTo-SecureString -Key $EncryptionKeyBytes |
+			ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
+			$Config.APISecretKey = $Config.APISecretKey | ConvertTo-SecureString -Key $EncryptionKeyBytes |
+			ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
+		}
 				
 		# Import Datto RMM Module
 		Import-Module DattoRMM -Force
