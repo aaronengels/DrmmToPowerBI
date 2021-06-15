@@ -16,6 +16,12 @@ $sqlParams = [ordered]@{
 	Password   =  $Config.SQLPassword
 }
 
+if ( $null -ne $env:DrmmToPowerBICredentialKey ) {
+	$EncryptionKeyBytes = ( [system.Text.Encoding]::UTF8 ).GetBytes( $env:DrmmToPowerBICredentialKey )
+	$sqlParams.SQLPassword = $sqlParams.SQLPassword | ConvertTo-SecureString -Key $EncryptionKeyBytes |
+	ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
+}
+
 # Create SQL Connection String
 $connString = 'Server={0};Database={1};User Id={2};Password={3};' -f [array]$sqlParams.Values
 
