@@ -63,6 +63,10 @@ IF OBJECT_ID('drmm.FK_devices_site') IS NULL
 ALTER TABLE [drmm].[devices] WITH CHECK ADD CONSTRAINT [FK_devices_site] FOREIGN KEY([siteId]) REFERENCES [drmm].[sites] ([id])
 GO
 
+IF OBJECT_ID('drmm.FK_devices_timevary_devices') IS NULL
+ALTER TABLE [drmm].[devices_timevary] WITH CHECK ADD CONSTRAINT [FK_devices_timevary_devices] FOREIGN KEY([Id]) REFERENCES [drmm].[devices] ([id])
+GO
+
 IF OBJECT_ID ('drmm.patchstatus') IS NULL
 CREATE TABLE [drmm].[patchstatus](
 	[deviceId] INT,
