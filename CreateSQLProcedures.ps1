@@ -5,6 +5,12 @@ if (!$Config) {
 	exit 1
 }
 
+if ( $null -ne $env:DrmmToPowerBICredentialKey ) {
+	$EncryptionKeyBytes = ( [system.Text.Encoding]::UTF8 ).GetBytes( $env:DrmmToPowerBICredentialKey )
+	$Config.SQLPassword = $Config.SQLPassword | ConvertTo-SecureString -Key $EncryptionKeyBytes |
+	ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
+}
+
 # Import Module
 Import-Module SQLServer -Force
 
@@ -14,12 +20,6 @@ $sqlParams = [ordered]@{
 	Database   =  $Config.SQLDatabase
 	User       =  $Config.SQLUser
 	Password   =  $Config.SQLPassword
-}
-
-if ( $null -ne $env:DrmmToPowerBICredentialKey ) {
-	$EncryptionKeyBytes = ( [system.Text.Encoding]::UTF8 ).GetBytes( $env:DrmmToPowerBICredentialKey )
-	$sqlParams.SQLPassword = $sqlParams.SQLPassword | ConvertTo-SecureString -Key $EncryptionKeyBytes |
-	ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
 }
 
 # Create SQL Connection String
