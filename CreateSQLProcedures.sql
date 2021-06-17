@@ -143,7 +143,7 @@ AS
 		DATEADD(s, CAST(ROUND([lastAuditEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastAudit],
 		DATEADD(s, CAST(ROUND([lastRebootEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastReboot],
 		DATEADD(s, CAST(ROUND([lastSeenEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastSeen],
-		GETDATE() AS [lastUpdate]
+		GETDATE() AS [timestamp]
 	FROM OPENJSON(@json)
 	WITH (   
 		[id] INT						'$.id',
@@ -237,7 +237,7 @@ AS
 			target.[lastUpdate] = GETDATE();
 	MERGE drmm.devices_timevary AS target
 	USING temp.devices_timevary AS source 
-	ON (target.[id] = source.[id])
+	ON (target.[timestamp] = source.[timestamp])
 	WHEN MATCHED THEN 
 		UPDATE SET 
 			target.[dotNetVersion] = source.[dotNetVersion],
@@ -249,7 +249,7 @@ AS
 			target.[lastAudit] = source.[lastAudit],
 			target.[lastReboot] = source.[lastReboot],
 			target.[lastSeen] = source.[lastSeen],
-			target.[lastUpdate] = source.[lastUpdate]
+			target.[timestamp] = source.[timestamp]
 	WHEN NOT MATCHED BY TARGET THEN
 		INSERT (
 			[id],
@@ -262,7 +262,7 @@ AS
 			[lastAudit],
 			[lastReboot],
 			[lastSeen],
-			[lastupdate]
+			[timestamp]
 		)
 		VALUES (
 			source.[id],
@@ -275,10 +275,8 @@ AS
 			source.[lastAudit],
 			source.[lastReboot],
 			source.[lastSeen],
-			source.[lastupdate]
-		)
-	WHEN NOT MATCHED BY SOURCE THEN
-		DELETE;
+			source.[timestamp]
+		);
 GO
 
 IF OBJECT_ID ('drmm.insertAlert') IS NOT NULL
