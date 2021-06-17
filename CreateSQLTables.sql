@@ -55,7 +55,7 @@ CREATE TABLE [drmm].[devices_timevary](
 	[lastAudit] DATETIME,
 	[lastReboot] DATETIME,
 	[lastSeen] DATETIME,
-	[lastUpdate] DATETIME
+	[timestamp] DATETIME
 )
 GO
 
@@ -254,7 +254,7 @@ CREATE TABLE [temp].[devices_timevary](
 	[lastAudit] DATETIME,
 	[lastReboot] DATETIME,
 	[lastSeen] DATETIME,
-	[lastUpdate] DATETIME
+	[timestamp] DATETIME
 )
 
 GO
