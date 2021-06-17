@@ -45,7 +45,7 @@ GO
 
 IF OBJECT_ID ('drmm.devices_timevary') IS NULL
 CREATE TABLE [drmm].[devices_timevary](
-	[id] INT NOT NULL PRIMARY KEY,
+	[id] INT,
 	[dotNetVersion] VARCHAR(MAX),
 	[username] VARCHAR(MAX),
 	[lastSeenUser] VARCHAR(MAX),
@@ -240,7 +240,7 @@ GO
 
 IF OBJECT_ID ('temp.devices_timevary') IS NULL
 CREATE TABLE [temp].[devices_timevary](
-	[id] INT NOT NULL PRIMARY KEY,
+	[id] INT,
 	[dotNetVersion] VARCHAR(MAX),
 	[username] VARCHAR(MAX),
 	[lastSeenUser] VARCHAR(MAX),
