@@ -10,7 +10,7 @@
 		}
 				
 		# Import Datto RMM Module
-		Remove-Module SQLPS
+		Remove-Module SQLPS -ErrorAction SilentlyContinue
 		Import-Module DattoRMM -Force
 		
 		# Set Datto RMM API Parameters
@@ -24,7 +24,6 @@
 		Set-DrmmApiParameters @apiParams -ErrorAction Stop
 
 		# Import SQL Server Module
-		Remove-Module PSSql
 		Import-Module SQLServer -Force
 
 		# Create SQL Connection Parameters
