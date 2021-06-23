@@ -10,6 +10,7 @@
 		}
 				
 		# Import Datto RMM Module
+		Remove-Module SQLPS -ErrorAction SilentlyContinue
 		Import-Module DattoRMM -Force
 		
 		# Set Datto RMM API Parameters
@@ -37,15 +38,15 @@
 		$connString = 'Server={0};Database={1};User Id={2};Password={3};' -f [array]$sqlParams.Values
 
 		# Truncate SQL temp tables
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.sites"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.devices"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.alerts"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.patchstatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.thirdpartystatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.avstatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.agentstatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.diskstatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "TRUNCATE TABLE temp.udfs"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.sites"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.devices"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.alerts"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.patchstatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.thirdpartystatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.avstatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.agentstatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.diskstatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "TRUNCATE TABLE temp.udfs"
 
 	}
 	catch {
@@ -66,7 +67,7 @@ PROCESS {
 			$json = $site | ConvertTo-Json
 		
 			# Insert site data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertSite N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertSite N'$json'"
 
 		}
 			
@@ -85,35 +86,35 @@ PROCESS {
 			$json = $device | ConvertTo-Json
 
 			# Insert device data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertDevice N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertDevice N'$json'"
 			
 			# Insert device Patch Status data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertPatchStatus N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertPatchStatus N'$json'"
 
 			# Insert device Third Party Status data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertThirdPartyStatus N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertThirdPartyStatus N'$json'"
 
 			# Insert device AV Status data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertAVStatus N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertAVStatus N'$json'"
 
 			# Insert device Agent Status data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertAgentStatus N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertAgentStatus N'$json'"
 
 			# Insert device UDF data into SQL temp table
-			Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertUDFs N'$json'"
+			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertUDFs N'$json'"
 
 			# Insert device Disk Status data into SQL temp table
 			foreach ($disk in $device.logicalDisks) {
 				$disk | Add-Member -NotePropertyName deviceId -NotePropertyValue $device.id
 				$jsonDisk = $disk | ConvertTo-Json
-				Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertDiskStatus N'$jsonDisk'"
+				Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertDiskStatus N'$jsonDisk'"
 			}
 			
 			# Insert device alert data into SQL temp table
 			foreach($alert in Get-DrmmDeviceOpenAlerts $device.uid) {	
 				$alert | Add-Member -NotePropertyName deviceId -NotePropertyValue $device.id
 				$json = $alert | Add-DrmmAlertMessage | ConvertTo-Json
-				Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.insertAlert N'$json'"
+				Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertAlert N'$json'"
 			}
 		}	
 	}
@@ -129,15 +130,15 @@ END {
 	try {
 		
 		# Merge SQL temp tables 
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeSites"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeDevices"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeAlerts"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergePatchStatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeThirdPartyStatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeAvStatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeAgentStatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeDiskStatus"
-		Invoke-Sqlcmd -ConnectionString $connString -Query "EXEC drmm.mergeUDFs"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeSites"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeDevices"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeAlerts"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergePatchStatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeThirdPartyStatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeAvStatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeAgentStatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeDiskStatus"
+		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeUDFs"
 	}
 	catch {
 

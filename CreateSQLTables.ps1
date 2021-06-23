@@ -6,6 +6,7 @@ if (!$Config) {
 }
 
 # Import Module
+Remove-Module SQLPS -ErrorAction SilentlyContinue
 Import-Module SQLServer -Force
 
 # Create SQL Connection Parameters
@@ -20,4 +21,4 @@ $sqlParams = [ordered]@{
 $connString = 'Server={0};Database={1};User Id={2};Password={3};' -f [array]$sqlParams.Values
 
 # Run SQL query to Create SQL Tables
-Invoke-Sqlcmd -ConnectionString $connString -InputFile 'CreateTables.sql'
+Invoke-Sqlcmd -ConnectionString $connString -InputFile 'CreateSQLTables.sql'
