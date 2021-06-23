@@ -5,6 +5,12 @@ if (!$Config) {
 	exit 1
 }
 
+if ( $null -ne $env:DrmmToPowerBICredentialKey ) {
+	$EncryptionKeyBytes = ( [system.Text.Encoding]::UTF8 ).GetBytes( $env:DrmmToPowerBICredentialKey )
+	$Config.SQLPassword = $Config.SQLPassword | ConvertTo-SecureString -Key $EncryptionKeyBytes |
+	ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
+}
+
 # Import Module
 Remove-Module SQLPS -ErrorAction SilentlyContinue
 Import-Module SQLServer -Force
