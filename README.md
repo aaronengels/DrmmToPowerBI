@@ -12,7 +12,9 @@ Install-Module -Name SqlServer -AllowClobber
 ```
 # Scripts
 ## Set Config
-You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/Set-Config.ps1) once. It is an interactive script that sets registry values for you based on your input. It also allows you to encrypt your SQL password and Datto RMM API Secret Key so it is not stored in plaintext in the registry. If you do opt to encrypt, this script will provide you with the randomly generated encryption key. In order to run the remaining scripts, you will need to provide that key in the form of the variable `$env:DrmmToPowerBICredentialKey` (this is designed so that you can store the key in the Datto RMM system as a masked account variable and run UpdateSQLTables.ps1 as a component).
+You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/Set-Config.ps1) once. It is an interactive script that sets registry values for you based on your input. It also allows you to encrypt your SQL password and Datto RMM API Secret Key so it is not stored in plaintext in the registry. If you do opt to encrypt, this script will provide you with the randomly generated encryption key. 
+
+In order to run the remaining scripts, you will need to provide that key in the form of the variable `$env:DrmmToPowerBICredentialKey` (this is designed so that you can store the key in the Datto RMM system as a masked account variable and run UpdateSQLTables.ps1 as a component).
 ## Create SQL Tables
 You only need to run this [script](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLTables.ps1) once.  Alternatively run the [query](https://github.com/aaronengels/DrmmToPowerBI/blob/main/CreateSQLTables.sql) directly in SQL to create the tables in the database.  I decided to create a simple database [schema](https://github.com/aaronengels/DrmmToPowerBI/blob/main/SQLTables.jpg) that can be used easly to create dashboards and reports in Microsoft PowerBI.
 ## Create SQL Procedures
