@@ -13,7 +13,7 @@ CREATE TABLE [drmm].[sites](
 	[ondemand] BIT,
 	[deleted] BIT,
 	[autotaskName] VARCHAR(MAX),
-	[autotaskId] VARCHAR(MAX),
+	[autotaskId] INT,
 	[portalUrl] VARCHAR(MAX),
 	[lastUpdate] DATETIME
 )
