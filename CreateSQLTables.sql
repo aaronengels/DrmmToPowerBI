@@ -13,7 +13,7 @@ CREATE TABLE [drmm].[sites](
 	[ondemand] BIT,
 	[deleted] BIT,
 	[autotaskName] VARCHAR(MAX),
-	[autotaskId] INT,
+	[autotaskId] VARCHAR(MAX),
 	[portalUrl] VARCHAR(MAX),
 	[lastUpdate] DATETIME
 )
@@ -28,34 +28,27 @@ CREATE TABLE [drmm].[devices](
 	[description] VARCHAR(MAX),
 	[deviceType] VARCHAR(MAX),
 	[deviceClass] VARCHAR(MAX),
+	[dotNetVersion] VARCHAR(MAX),
 	[manufacturer] VARCHAR(MAX),
 	[model] VARCHAR(MAX),
 	[serialnumber] VARCHAR(MAX),
 	[cpuCores] INT,
 	[memory] INT,
 	[domain] VARCHAR(MAX),
-	[is64bit] BIT,
-	[snmpEnabled] BIT,
-	[suspended] BIT,
-	[deleted] BIT,
-	[warrantyDate] DATETIME,
-	[lastUpdate] DATETIME
-)
-GO
-
-IF OBJECT_ID ('drmm.devices_timevary') IS NULL
-CREATE TABLE [drmm].[devices_timevary](
-	[id] INT,
-	[dotNetVersion] VARCHAR(MAX),
 	[username] VARCHAR(MAX),
 	[lastSeenUser] VARCHAR(MAX),
 	[ipaddress] VARCHAR(MAX),
 	[os] VARCHAR(MAX),
+	[is64bit] BIT,
+	[snmpEnabled] BIT,
+	[suspended] BIT,
+	[deleted] BIT,
 	[rebootRequired] BIT,
+	[warrantyDate] DATETIME,
 	[lastAudit] DATETIME,
 	[lastReboot] DATETIME,
 	[lastSeen] DATETIME,
-	[timestamp] DATETIME
+	[lastUpdate] DATETIME
 )
 GO
 
@@ -63,9 +56,6 @@ IF OBJECT_ID('drmm.FK_devices_site') IS NULL
 ALTER TABLE [drmm].[devices] WITH CHECK ADD CONSTRAINT [FK_devices_site] FOREIGN KEY([siteId]) REFERENCES [drmm].[sites] ([id])
 GO
 
-IF OBJECT_ID('drmm.FK_devices_timevary_devices') IS NULL
-ALTER TABLE [drmm].[devices_timevary] WITH CHECK ADD CONSTRAINT [FK_devices_timevary_devices] FOREIGN KEY([Id]) REFERENCES [drmm].[devices] ([id])
-GO
 
 IF OBJECT_ID ('drmm.patchstatus') IS NULL
 CREATE TABLE [drmm].[patchstatus](
@@ -226,35 +216,27 @@ CREATE TABLE [temp].[devices](
 	[description] VARCHAR(MAX),
 	[deviceType] VARCHAR(MAX),
 	[deviceClass] VARCHAR(MAX),
+	[dotNetVersion] VARCHAR(MAX),
 	[manufacturer] VARCHAR(MAX),
 	[model] VARCHAR(MAX),
 	[serialnumber] VARCHAR(MAX),
 	[cpuCores] INT,
 	[memory] INT,
 	[domain] VARCHAR(MAX),
-	[is64bit] BIT,
-	[snmpEnabled] BIT,
-	[suspended] BIT,
-	[deleted] BIT,
-	[warrantyDate] DATETIME,
-	[lastUpdate] DATETIME
-)
-
-GO
-
-IF OBJECT_ID ('temp.devices_timevary') IS NULL
-CREATE TABLE [temp].[devices_timevary](
-	[id] INT,
-	[dotNetVersion] VARCHAR(MAX),
 	[username] VARCHAR(MAX),
 	[lastSeenUser] VARCHAR(MAX),
 	[ipaddress] VARCHAR(MAX),
 	[os] VARCHAR(MAX),
+	[is64bit] BIT,
+	[snmpEnabled] BIT,
+	[suspended] BIT,
+	[deleted] BIT,
 	[rebootRequired] BIT,
+	[warrantyDate] DATETIME,
 	[lastAudit] DATETIME,
 	[lastReboot] DATETIME,
 	[lastSeen] DATETIME,
-	[timestamp] DATETIME
+	[lastUpdate] DATETIME
 )
 
 GO
