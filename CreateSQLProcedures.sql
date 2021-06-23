@@ -113,7 +113,7 @@ AS
 		[suspended],
 		[deleted],
 		[rebootRequired],
-		DATEADD(s, CAST(ROUND([warrantyDateEpoch] / 1000,0) AS INT), '1970-01-01') AS [warrantyDate],
+		[warrantyDate],
 		DATEADD(s, CAST(ROUND([lastAuditEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastAudit],
 		DATEADD(s, CAST(ROUND([lastRebootEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastReboot],
 		DATEADD(s, CAST(ROUND([lastSeenEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastSeen],
@@ -143,7 +143,7 @@ AS
 		[suspended] BIT					'$.suspended',
 		[deleted] BIT					'$.deleted',
 		[rebootRequired] BIT			'$.rebootRequired',
-		[warrantyDateEpoch] BIGINT		'$.warrantyDate',
+		[warrantyDate] VARCHAR(MAX)		'$.warrantyDate',
 		[lastAuditEpoch] BIGINT			'$.lastAuditDate',
 		[lastRebootEpoch] BIGINT		'$.lastReboot',
 		[lastSeenEpoch] BIGINT			'$.lastSeen'
