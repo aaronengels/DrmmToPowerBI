@@ -97,26 +97,17 @@ AS
 		[description],
 		[deviceType],
 		[deviceClass],
-		[dotNetVersion],
 		[manufacturer],
 		[model],
 		[serialnumber],
 		[cpuCores],
 		[memoryBig]/1024/1024 AS [memory],
 		[domain],
-		[username],
-		[lastSeenUser],
-		[ipaddress],
-		[os],
 		[is64bit],
 		[snmpEnabled],
 		[suspended],
 		[deleted],
-		[rebootRequired],
 		DATEADD(s, CAST(ROUND([warrantyDateEpoch] / 1000,0) AS INT), '1970-01-01') AS [warrantyDate],
-		DATEADD(s, CAST(ROUND([lastAuditEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastAudit],
-		DATEADD(s, CAST(ROUND([lastRebootEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastReboot],
-		DATEADD(s, CAST(ROUND([lastSeenEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastSeen],
 		GETDATE() AS [lastUpdate]
 	FROM OPENJSON(@json)
 	WITH (   
@@ -127,23 +118,41 @@ AS
 		[description] VARCHAR(MAX)		'$.description',
 		[deviceType] VARCHAR(MAX)		'$.deviceType.category',
 		[deviceClass] VARCHAR(MAX)		'$.deviceClass',
-		[dotNetVersion] VARCHAR(MAX)	'$.systemInfo.dotNetVersion',
 		[manufacturer] VARCHAR(MAX)		'$.systemInfo.manufacturer',
 		[model] VARCHAR(MAX)			'$.systemInfo.model',
 		[serialnumber] VARCHAR(MAX)		'$.bios.serialNumber',
 		[cpuCores] INT					'$.systemInfo.totalCpuCores',
 		[memoryBig] BIGINT				'$.systemInfo.totalPhysicalMemory',
 		[domain] VARCHAR(MAX)			'$.domain',
-		[username] VARCHAR(MAX)			'$.systemInfo.username',
-		[lastSeenUser] VARCHAR(MAX)		'$.lastLoggedInUser',
-		[ipaddress] VARCHAR(MAX)		'$.intIpAddress',
-		[os] VARCHAR(MAX)				'$.operatingSystem',
 		[is64bit] BIT					'$.a64Bit',
 		[snmpEnabled] BIT				'$.snmpEnabled',
 		[suspended] BIT					'$.suspended',
 		[deleted] BIT					'$.deleted',
-		[rebootRequired] BIT			'$.rebootRequired',
 		[warrantyDateEpoch] BIGINT		'$.warrantyDate',
+		[lastSeenEpoch] BIGINT			'$.lastSeen'
+	);
+	INSERT INTO temp.devices_timevary
+	SELECT
+		[id],
+		[dotNetVersion],
+		[username],
+		[lastSeenUser],
+		[ipaddress],
+		[os],
+		[rebootRequired],
+		DATEADD(s, CAST(ROUND([lastAuditEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastAudit],
+		DATEADD(s, CAST(ROUND([lastRebootEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastReboot],
+		DATEADD(s, CAST(ROUND([lastSeenEpoch] / 1000,0) AS INT), '1970-01-01') AS [lastSeen],
+		GETDATE() AS [timestamp]
+	FROM OPENJSON(@json)
+	WITH (   
+		[id] INT						'$.id',
+		[dotNetVersion] VARCHAR(MAX)	'$.systemInfo.dotNetVersion',
+		[username] VARCHAR(MAX)			'$.systemInfo.username',
+		[lastSeenUser] VARCHAR(MAX)		'$.lastLoggedInUser',
+		[ipaddress] VARCHAR(MAX)		'$.intIpAddress',
+		[os] VARCHAR(MAX)				'$.operatingSystem',
+		[rebootRequired] BIT			'$.rebootRequired',
 		[lastAuditEpoch] BIGINT			'$.lastAuditDate',
 		[lastRebootEpoch] BIGINT		'$.lastReboot',
 		[lastSeenEpoch] BIGINT			'$.lastSeen'
@@ -167,26 +176,17 @@ AS
 			target.[description] = source.[description],
 			target.[deviceType] = source.[deviceType],
 			target.[deviceClass] = source.[deviceClass],
-			target.[dotNetVersion] = source.[dotNetVersion],
 			target.[manufacturer] = source.[manufacturer],
 			target.[model] = source.[model],
 			target.[serialnumber] = source.[serialnumber],
 			target.[cpuCores] = source.[cpuCores],
 			target.[memory] = source.[memory],
 			target.[domain] = source.[domain],
-			target.[username] = source.[username],
-			target.[lastSeenUser] = source.[lastSeenUser],
-			target.[ipaddress] = source.[ipaddress],
-			target.[os] = source.[os],
 			target.[is64bit] = source.[is64bit],
 			target.[snmpEnabled] = source.[snmpEnabled],
 			target.[suspended] = source.[suspended],
 			target.[deleted] = source.[deleted],
-			target.[rebootRequired] = source.[rebootRequired],
 			target.[warrantyDate] = source.[warrantyDate],
-			target.[lastAudit] = source.[lastAudit],
-			target.[lastReboot] = source.[lastReboot],
-			target.[lastSeen] = source.[lastSeen],
 			target.[lastUpdate] = source.[lastUpdate]
 	WHEN NOT MATCHED BY TARGET THEN
 		INSERT (
@@ -197,26 +197,17 @@ AS
 			[description],
 			[deviceType],
 			[deviceClass],
-			[dotNetVersion],
 			[manufacturer],
 			[model],
 			[serialnumber],
 			[cpuCores],
 			[memory],
 			[domain],
-			[username],
-			[lastSeenUser],
-			[ipaddress],
-			[os],
 			[is64bit],
 			[snmpEnabled],
 			[suspended],
 			[deleted],
-			[rebootRequired],
 			[warrantyDate],
-			[lastAudit],
-			[lastReboot],
-			[lastSeen],
 			[lastupdate]
 		)
 		VALUES (
@@ -227,32 +218,65 @@ AS
 			source.[description],
 			source.[deviceType],
 			source.[deviceClass],
-			source.[dotNetVersion],
 			source.[manufacturer],
 			source.[model],
 			source.[serialnumber],
 			source.[cpuCores],
 			source.[memory],
 			source.[domain],
-			source.[username],
-			source.[lastSeenUser],
-			source.[ipaddress],
-			source.[os],
 			source.[is64bit],
 			source.[snmpEnabled],
 			source.[suspended],
 			source.[deleted],
-			source.[rebootRequired],
 			source.[warrantyDate],
-			source.[lastAudit],
-			source.[lastReboot],
-			source.[lastSeen],
 			source.[lastupdate]
 		)
 	WHEN NOT MATCHED BY SOURCE THEN
 		UPDATE SET
 			target.[deleted] = 1,
 			target.[lastUpdate] = GETDATE();
+	MERGE drmm.devices_timevary AS target
+	USING temp.devices_timevary AS source 
+	ON (target.[timestamp] = source.[timestamp])
+	WHEN MATCHED THEN 
+		UPDATE SET 
+			target.[dotNetVersion] = source.[dotNetVersion],
+			target.[username] = source.[username],
+			target.[lastSeenUser] = source.[lastSeenUser],
+			target.[ipaddress] = source.[ipaddress],
+			target.[os] = source.[os],
+			target.[rebootRequired] = source.[rebootRequired],
+			target.[lastAudit] = source.[lastAudit],
+			target.[lastReboot] = source.[lastReboot],
+			target.[lastSeen] = source.[lastSeen],
+			target.[timestamp] = source.[timestamp]
+	WHEN NOT MATCHED BY TARGET THEN
+		INSERT (
+			[id],
+			[dotNetVersion],
+			[username],
+			[lastSeenUser],
+			[ipaddress],
+			[os],
+			[rebootRequired],
+			[lastAudit],
+			[lastReboot],
+			[lastSeen],
+			[timestamp]
+		)
+		VALUES (
+			source.[id],
+			source.[dotNetVersion],
+			source.[username],
+			source.[lastSeenUser],
+			source.[ipaddress],
+			source.[os],
+			source.[rebootRequired],
+			source.[lastAudit],
+			source.[lastReboot],
+			source.[lastSeen],
+			source.[timestamp]
+		);
 GO
 
 IF OBJECT_ID ('drmm.insertAlert') IS NOT NULL
