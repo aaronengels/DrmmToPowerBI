@@ -1,11 +1,33 @@
-﻿BEGIN {
-	
+﻿<#
+	.SYNOPSIS
+
+	.DESCRIPTION
+
+	.PARAMETER SkipDeviceFields
+	Comma separated list of device related fields.
+	Any field given here is removed from SQL injection object, so the information in the fields is not passed to SQL database.
+
+	.EXAMPLE
+	PS> UpdateSQLTables.ps1 -SkipDeviceFields lastLoggedInUser,systemInfo.username
+
+	.LINK
+	GitHub: https://github.com/aaronengels/DrmmToPowerBI
+#>
+
+Param
+(
+	[Parameter(Mandatory=$False)]
+    [string[]]$SkipDeviceFields
+
+)
+BEGIN {
+
 	try {
 
 		# Get DrmmToPowerBI registry values
 		$Config = Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\DrmmToPowerBI -ErrorAction SilentlyContinue
 		if (!$Config) {
-			Write-Host 'Registry keys not found. Please import DrmmToPowerBI.reg first!'
+			Write-Output 'Registry keys not found. Please import DrmmToPowerBI.reg first!'
 			exit 1
 		}
 		if ( $null -ne $env:DrmmToPowerBICredentialKey ) {
@@ -15,11 +37,11 @@
 			$Config.APISecretKey = $Config.APISecretKey | ConvertTo-SecureString -Key $EncryptionKeyBytes |
 			ForEach-Object { [Runtime.InteropServices.Marshal]::PtrToStringAuto( [Runtime.InteropServices.Marshal]::SecureStringToBSTR( $_ ) ) }
 		}
-				
+
 		# Import Datto RMM Module
 		Remove-Module SQLPS -ErrorAction SilentlyContinue
 		Import-Module DattoRMM -Force
-		
+
 		# Set Datto RMM API Parameters
 		$apiParams = [ordered]@{
 				Url       =  $Config.APIUrl
@@ -63,21 +85,21 @@
 }
 
 PROCESS {
-	
+
 
 	try {
-	
+
 		# Insert API site data into SQL temp table
 		foreach($site in Get-DrmmAccountSites) {
-		
+
 			# Convert API data to JSON	
 			$json = $site | ConvertTo-Json
-		
+
 			# Insert site data into SQL temp table
 			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertSite N'$json'"
 
 		}
-			
+
 		# Insert API device data into SQL temp table
 		foreach($device in Get-DrmmAccountDevices) {
 
@@ -89,12 +111,30 @@ PROCESS {
 				$device | Add-Member -NotePropertyName logicalDisks -NotePropertyValue $audit.logicalDisks
 			}
 
+			# Remove given device field properties from device object before injecting to SQL
+			if ($SkipDeviceFields) {
+                foreach ($skipDeviceField in $SkipDeviceFields) {
+					if ($skipDeviceField -like "*.*") {
+						$lastInstance = $skipDeviceField.IndexOf('.')
+						$devicePropertyGroup = $($skipDeviceField.Substring(0,$lastInstance))
+						$deviceProperty = $($skipDeviceField.Substring($lastInstance + 1,$skipDeviceField.Length - $lastInstance - 1))
+						if ($device -and (Get-Member -InputObject $device."$devicePropertyGroup" -Name $deviceProperty -MemberType Properties)) {
+						    $device."$devicePropertyGroup".PSObject.properties.remove($deviceProperty)
+                        }
+					} else {
+						if ($device -and (Get-Member -InputObject $device -Name $skipDeviceField -MemberType Properties)) {
+						    $device.PSObject.properties.remove($skipDeviceField)
+                        }
+					}
+				}
+            }
+
 			# Convert API device data to JSON
 			$json = $device | ConvertTo-Json
 
 			# Insert device data into SQL temp table
 			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertDevice N'$json'"
-			
+
 			# Insert device Patch Status data into SQL temp table
 			Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertPatchStatus N'$json'"
 
@@ -116,14 +156,14 @@ PROCESS {
 				$jsonDisk = $disk | ConvertTo-Json
 				Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertDiskStatus N'$jsonDisk'"
 			}
-			
+
 			# Insert device alert data into SQL temp table
-			foreach($alert in Get-DrmmDeviceOpenAlerts $device.uid) {	
+			foreach($alert in Get-DrmmDeviceOpenAlerts $device.uid) {
 				$alert | Add-Member -NotePropertyName deviceId -NotePropertyValue $device.id
 				$json = $alert | Add-DrmmAlertMessage | ConvertTo-Json
 				Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.insertAlert N'$json'"
 			}
-		}	
+		}
 	}
 	catch {
 
@@ -135,8 +175,8 @@ PROCESS {
 END {
 
 	try {
-		
-		# Merge SQL temp tables 
+
+		# Merge SQL temp tables
 		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeSites"
 		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeDevices"
 		Invoke-Sqlcmd -ConnectionString $connString -QueryTimeout 0 -Query "EXEC drmm.mergeAlerts"
@@ -149,6 +189,6 @@ END {
 	}
 	catch {
 
-		$_.Exception.Message	
+		$_.Exception.Message
 	}
 }
