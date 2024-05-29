@@ -1,11 +1,10 @@
 ﻿Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\DrmmToPowerBI]
-"SQL Server"=""
-"SQL Database"=""
-"SQL User"=""
-"SQL Password"=""
-"API Url"=""
-"API Access Key"=""
-"API Secret Key"=""
-"Store passwords in encrypted format? [Y]es or [N]o"=""
+"SQLServer"=""
+"SQLDatabase"=""
+"SQLUser"=""
+"SQLPassword"=""
+"APIUrl"=""
+"APIKey"=""
+"APISecretKey"=""
